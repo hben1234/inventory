@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Orders - Inventory System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Customer Orders</h1>
+
+    <!-- New Order Form -->
+    <form action="/create-order" method="POST">
+        <h2>Create New Order</h2>
+
+        <div class="form-group">
+            <label for="customer-name">Customer Name:</label>
+            <input type="text" id="customer-name" name="customer-name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="customer-email">Customer Email:</label>
+            <input type="email" id="customer-email" name="customer-email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="customer-phone">Phone Number:</label>
+            <input type="tel" id="customer-phone" name="customer-phone">
+        </div>
+
+        <!-- Product Selection -->
+        <div class="form-group">
+            <h3>Products</h3>
+            <div id="product-list">
+                <div class="product-entry">
+                    <select name="products[]" required>
+                        <option value="">Select Product</option>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <input type="number" name="quantities[]" min="1" placeholder="Quantity" required>
+                    <button type="button" onclick="removeProduct(this)">Remove</button>
+                </div>
+            </div>
+            <button type="button" onclick="addProduct()">Add Another Product</button>
+        </div>
+
+        <div class="form-group">
+            <label for="shipping-address">Shipping Address:</label>
+            <textarea id="shipping-address" name="shipping-address" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="order-notes">Order Notes:</label>
+            <textarea id="order-notes" name="order-notes" rows="3"></textarea>
+        </div>
+
+        <button type="submit">Place Order</button>
+    </form>
+
+    <!-- Order History -->
+    <h2>Order History</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Order Date</th>
+                <th>Total Items</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- This will be populated dynamically -->
+        </tbody>
+    </table>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

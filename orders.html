@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders Management</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Orders specific styles */
+      .orders-content {
+        padding: 20px;
+      }
+
+      .orders-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .orders-filters {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 20px;
+      }
+
+      .filter-options {
+        display: flex;
+        gap: 10px;
+      }
+
+      .filter-select {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        min-width: 150px;
+      }
+
+      .orders-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .orders-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .orders-table th,
+      .orders-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+
+      .orders-table th {
+        background-color: #f8f9fa;
+        font-weight: 500;
+      }
+
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.85em;
+      }
+
+      .status-badge.pending {
+        background-color: #fff3e0;
+        color: #ef6c00;
+      }
+
+      .status-badge.processing {
+        background-color: #e3f2fd;
+        color: #1976d2;
+      }
+
+      .status-badge.shipped {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .status-badge.delivered {
+        background-color: #e8eaf6;
+        color: #283593;
+      }
+
+      .status-badge.cancelled {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .action-buttons button {
+        border: none;
+        background: none;
+        padding: 6px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+
+      .view-btn {
+        color: #4caf50;
+      }
+      .edit-btn {
+        color: #2196f3;
+      }
+      .delete-btn {
+        color: #f44336;
+      }
+
+      .action-buttons button:hover {
+        background-color: #f5f5f5;
+        transform: translateY(-1px);
+      }
+
+      .customer-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .customer-info img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .customer-details {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .customer-name {
+        font-weight: 500;
+      }
+
+      .customer-email {
+        font-size: 0.85em;
+        color: #666;
+      }
+
+      .order-items {
+        color: #666;
+        font-size: 0.9em;
+      }
+
+      .price {
+        font-weight: 500;
+        color: #2196f3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <i class="fas fa-warehouse"></i>
+          <span>InventoryPro</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="dashboard.html">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html">
+                <i class="fas fa-boxes"></i>
+                <span>Inventory</span>
+              </a>
+            </li>
+            <li class="active">
+              <a href="orders.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="supplyers.html">
+                <i class="fas fa-users"></i>
+                <span>Supplyers</span>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html">
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+              </a>
+            </li>
+            <li >
+              <a href="users.html">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+              </a>
+            </li>
+            <li >
+              <a href="settings.html">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="main-content">
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+          <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." />
+          </div>
+          <div class="top-nav-right">
+            <div class="notifications">
+              <i class="fas fa-bell"></i>
+              <span class="badge">3</span>
+            </div>
+
+            <div class="user-profile">
+              <img
+                src="https://via.placeholder.com/40"
+                alt="Profile"
+                class="profile-image"
+              />
+              <div class="user-info">
+                <span class="user-name">Sara Houda</span>
+                <span class="user-role">Administrator</span>
+              </div>
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+
+              <!-- Dropdown Menu -->
+              <div class="profile-dropdown">
+                <div class="dropdown-header">
+                  <img
+                    src="https://via.placeholder.com/40"
+                    alt="Profile"
+                    class="profile-image"
+                  />
+                  <div class="user-info">
+                    <span class="user-name">Sara Houda</span>
+                    <span class="user-email">Sara.Houda@emsi.com</span>
+                  </div>
+                </div>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="#profile">
+                      <i class="fas fa-user"></i>
+                      <span>My Profile</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#settings">
+                      <i class="fas fa-cog"></i>
+                      <span>Settings</span>
+                    </a>
+                  </li>
+
+                  <li class="dropdown-divider"></li>
+                  <li>
+                    <a href="#logout" class="logout-btn">
+                      <i class="fas fa-sign-out-alt"></i>
+                      <span>Logout</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div class="orders-content">
+          <div class="orders-header">
+            <h1>Orders Management</h1>
+          </div>
+
+          <div class="orders-filters">
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="text" placeholder="Search orders..." />
+            </div>
+            <div class="filter-options">
+              <select class="filter-select">
+                <option value="">Order Status</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <select class="filter-select">
+                <option value="">Time Period</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="orders-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Customer</th>
+                  <th>Order Items</th>
+                  <th>Total Amount</th>
+                  <th>Order Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>#ORD001</td>
+                  <td>
+                    <div class="customer-info">
+                      <img
+                        src="https://via.placeholder.com/32"
+                        alt="Customer"
+                      />
+                      <div class="customer-details">
+                        <span class="customer-name">Sara Lamghary</span>
+                        <span class="customer-email">Sara.Lamghary@gmail.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="order-items">
+                    2x Wireless Headphones, 1x Smart Watch
+                  </td>
+                  <td class="price">$399.97</td>
+                  <td>2024-01-15</td>
+                  <td>
+                    <span class="status-badge processing">Processing</span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="view-btn" title="View Details">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="edit-btn" title="Edit Order">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="delete-btn" title="Cancel Order">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>#ORD002</td>
+                  <td>
+                    <div class="customer-info">
+                      <img
+                        src="https://via.placeholder.com/32"
+                        alt="Customer"
+                      />
+                      <div class="customer-details">
+                        <span class="customer-name">Houda Bennani</span>
+                        <span class="customer-email">Houda.Bennani@gmail.com</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="order-items">1x Smart Watch</td>
+                  <td class="price">$199.99</td>
+                  <td>2024-01-14</td>
+                  <td><span class="status-badge delivered">Delivered</span></td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="view-btn" title="View Details">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="edit-btn" title="Edit Order">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="delete-btn" title="Cancel Order">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="script/dashboard.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Get the search input and filter elements
+        const searchInput = document.querySelector(
+          ".orders-filters .search-bar input"
+        );
+        const statusFilter = document.querySelector(
+          ".filter-options select:first-child"
+        );
+        const timeFilter = document.querySelector(
+          ".filter-options select:last-child"
+        );
+
+        // Function to filter the orders table
+        function filterOrders() {
+          const searchTerm = searchInput.value.toLowerCase();
+          const selectedStatus = statusFilter.value.toLowerCase();
+          const selectedTime = timeFilter.value.toLowerCase();
+          const tableRows = document.querySelectorAll(".orders-table tbody tr");
+
+          tableRows.forEach((row) => {
+            const orderId = row
+              .querySelector("td:nth-child(1)")
+              .textContent.toLowerCase();
+            const customerName = row
+              .querySelector(".customer-name")
+              .textContent.toLowerCase();
+            const customerEmail = row
+              .querySelector(".customer-email")
+              .textContent.toLowerCase();
+            const status = row
+              .querySelector(".status-badge")
+              .textContent.toLowerCase();
+            const orderDate = row.querySelector("td:nth-child(5)").textContent;
+
+            // Check if row matches search term
+            const matchesSearch =
+              orderId.includes(searchTerm) ||
+              customerName.includes(searchTerm) ||
+              customerEmail.includes(searchTerm);
+
+            // Check if row matches status filter
+            const matchesStatus =
+              selectedStatus === "" || status === selectedStatus;
+
+            // Check if row matches time filter
+            let matchesTime = true;
+            if (selectedTime !== "") {
+              const orderDateTime = new Date(orderDate);
+              const today = new Date();
+
+              switch (selectedTime) {
+                case "today":
+                  matchesTime =
+                    orderDateTime.toDateString() === today.toDateString();
+                  break;
+                case "week":
+                  const weekAgo = new Date(today.setDate(today.getDate() - 7));
+                  matchesTime = orderDateTime >= weekAgo;
+                  break;
+                case "month":
+                  matchesTime =
+                    orderDateTime.getMonth() === today.getMonth() &&
+                    orderDateTime.getFullYear() === today.getFullYear();
+                  break;
+                case "year":
+                  matchesTime =
+                    orderDateTime.getFullYear() === today.getFullYear();
+                  break;
+              }
+            }
+
+            // Show/hide row based on all filters
+            row.style.display =
+              matchesSearch && matchesStatus && matchesTime ? "" : "none";
+          });
+        }
+
+        // Add event listeners to search input and filters
+        searchInput.addEventListener("input", filterOrders);
+        statusFilter.addEventListener("change", filterOrders);
+        timeFilter.addEventListener("change", filterOrders);
+      });
+    </script>
+  </body>
+</html>

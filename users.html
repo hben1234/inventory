@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Management</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <style>
+      .users-content {
+        padding: 20px;
+      }
+
+      .users-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .add-user-btn {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .users-filters {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        gap: 20px;
+      }
+
+      .users-table {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .users-table table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .users-table th,
+      .users-table td {
+        vertical-align: middle;
+        padding: 12px 15px;
+      }
+
+      .users-table th {
+        background-color: #f8f9fa;
+        font-weight: 500;
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .user-picture {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+      }
+
+      .user-picture img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .user-details {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .user-name {
+        font-weight: 500;
+        color: #2c3e50;
+      }
+
+      .user-email {
+        color: #666;
+        font-size: 0.85em;
+      }
+
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.85em;
+      }
+
+      .status-badge.active {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+      }
+
+      .status-badge.inactive {
+        background-color: #ffebee;
+        color: #c62828;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 8px;
+      }
+
+      .action-buttons button {
+        border: none;
+        background: none;
+        padding: 6px;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+
+      .edit-btn {
+        color: #2196f3;
+      }
+      .delete-btn {
+        color: #f44336;
+      }
+      .view-btn {
+        color: #4caf50;
+      }
+
+      /* Modal styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        width: 90%;
+        max-width: 500px;
+        margin: 50px auto;
+        border-radius: 8px;
+        padding: 20px;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      .modal-header h2 {
+        font-size: 1.5rem;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #666;
+      }
+
+      .form-group input {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+
+      .modal-footer {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .modal-footer button {
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .save-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+      }
+
+      .cancel-btn {
+        background: none;
+        border: 1px solid #ddd;
+      }
+
+      .picture-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 2px dashed #ddd;
+        margin-top: 10px;
+        overflow: hidden;
+        display: none;
+      }
+
+      .picture-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .form-group input[type="file"] {
+        border: 1px solid #ddd;
+        padding: 8px;
+        width: 100%;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <i class="fas fa-warehouse"></i>
+          <span>InventoryPro</span>
+        </div>
+
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="active"> 
+              <a href="dashboard.html">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="inventory.html">
+                <i class="fas fa-boxes"></i>
+                <span>Inventory</span>
+              </a>
+            </li>
+            <li>
+              <a href="orders.html">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Orders</span>
+              </a>
+            </li>
+            <li>
+              <a href="reports.html">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+              </a>
+            </li>
+            <li>
+              <a href="supplyers.html">
+                <i class="fas fa-users"></i>
+                <span>Supplyers</span>
+              </a>
+            </li>
+            <li>
+              <a href="customers.html">
+                <i class="fas fa-users"></i>
+                <span>Customers</span>
+              </a>
+            </li>
+            <li >
+              <a href="users.html">
+                <i class="fas fa-users"></i>
+                <span>Users</span>
+              </a>
+            </li>
+            <li>
+              <a href="settings.html">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>     
+
+      <main class="main-content">
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+          <button id="sidebar-toggle" class="sidebar-toggle">
+            <i class="fas fa-bars"></i>
+          </button>
+
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search..." />
+          </div>
+          <div class="top-nav-right">
+            <div class="notifications">
+              <i class="fas fa-bell"></i>
+              <span class="badge">3</span>
+            </div>
+
+            <div class="user-profile">
+              <img
+                src="https://via.placeholder.com/40"
+                alt="Profile"
+                class="profile-image"
+              />
+              <div class="user-info">
+                <span class="user-name">Sara Houda</span>
+                <span class="user-role">Administrator</span>
+              </div>
+              <i class="fas fa-chevron-down dropdown-icon"></i>
+
+              <!-- Dropdown Menu -->
+              <div class="profile-dropdown">
+                <div class="dropdown-header">
+                  <img
+                    src="https://via.placeholder.com/40"
+                    alt="Profile"
+                    class="profile-image"
+                  />
+                  <div class="user-info">
+                    <span class="user-name">Sara Houda</span>
+                    <span class="user-email">Sara.Houda@emsi.com</span>
+                  </div>
+                </div>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="#profile">
+                      <i class="fas fa-user"></i>
+                      <span>My Profile</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#settings">
+                      <i class="fas fa-cog"></i>
+                      <span>Settings</span>
+                    </a>
+                  </li>
+
+                  <li class="dropdown-divider"></li>
+                  <li>
+                    <a href="#logout" class="logout-btn">
+                      <i class="fas fa-sign-out-alt"></i>
+                      <span>Logout</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div class="users-content">
+          <div class="users-header">
+            <h1>User Management</h1>
+            <button class="add-user-btn" onclick="openAddUserModal()">
+              <i class="fas fa-plus"></i> Add New User
+            </button>
+          </div>
+
+          <div class="users-filters">
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Search users..."
+                id="searchInput"
+              />
+            </div>
+            <div class="filter-options">
+              <select class="filter-select" id="statusFilter">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <select class="filter-select" id="roleFilter">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="user">User</option>
+                <option value="editor">Editor</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="users-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Picture</th>
+                  <th>Full Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Last Login</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <!-- Table rows will be dynamically added here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div class="modal" id="userModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add New User</h2>
+          <button class="close-btn" onclick="closeModal()">&times;</button>
+        </div>
+        <form id="userForm">
+          <div class="form-group">
+            <label for="userPicture">Profile Picture</label>
+            <input type="file" id="userPicture" accept="image/*" />
+            <div class="picture-preview" id="picturePreview"></div>
+          </div>
+          <div class="form-group">
+            <label for="userName">Full Name</label>
+            <input type="text" id="userName" required />
+          </div>
+          <div class="form-group">
+            <label for="userEmail">Email</label>
+            <input type="email" id="userEmail" required />
+          </div>
+          <div class="form-group">
+            <label for="userRole">Role</label>
+            <select id="userRole" required>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="editor">Editor</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="userStatus">Status</label>
+            <select id="userStatus" required>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="cancel-btn" onclick="closeModal()">
+              Cancel
+            </button>
+            <button type="submit" class="save-btn">Save User</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="script/dashboard.js"></script>
+    <script>
+      // Check authentication status
+      document.addEventListener("DOMContentLoaded", function () {
+        const isAuthenticated =
+          localStorage.getItem("adminAuthenticated") ||
+          sessionStorage.getItem("adminAuthenticated");
+
+        if (!isAuthenticated) {
+          window.location.href = "admin-login.html";
+          return;
+        }
+
+        // Initialize the users table
+        loadUsers();
+        setupEventListeners();
+      });
+
+      // Sample user data
+      const users = [
+        {
+          id: 1,
+          name: "Sara Lamghary",
+          email: "Sara.Lamghary@gmail.com",
+          role: "Admin",
+          lastLogin: "2025-01-14 14:30",
+          status: "active",
+          image: "https://via.placeholder.com/40",
+        },
+        {
+          id: 2,
+          name: "Houda Bennani",
+          email: "Houda.Bennani@gmail.com",
+          role: "User",
+          lastLogin: "2025-01-14 14:15",
+          status: "active",
+          image: "https://cdn.create.vista.com/api/media/small/666686162/stock-vector-hijab-logo-islamic-women-fashion-simple-design-muslim-clothing-vector",
+        },
+        // Add more users as needed
+      ];
+
+      function loadUsers() {
+        const tableBody = document.getElementById("usersTableBody");
+        tableBody.innerHTML = "";
+
+        users.forEach((user) => {
+          const row = `
+                  <tr>
+                      <td>
+                          <div class="user-picture">
+                              <img src="${user.image}" alt="${user.name}">
+                          </div>
+                      </td>
+                      <td>
+                          <span class="user-name">${user.name}</span>
+                      </td>
+                      <td>
+                          <span class="user-email">${user.email}</span>
+                      </td>
+                      <td>${user.role}</td>
+                      <td>${user.lastLogin}</td>
+                      <td><span class="status-badge ${user.status}">${user.status}</span></td>
+                      <td>
+                          <div class="action-buttons">
+                              <button class="view-btn" title="View Details" onclick="viewUser(${user.id})">
+                                  <i class="fas fa-eye"></i>
+                              </button>
+                              <button class="edit-btn" title="Edit User" onclick="editUser(${user.id})">
+                                  <i class="fas fa-edit"></i>
+                              </button>
+                              <button class="delete-btn" title="Delete User" onclick="deleteUser(${user.id})">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+                          </div>
+                      </td>
+                  </tr>
+              `;
+          tableBody.innerHTML += row;
+        });
+      }
+
+      function setupEventListeners() {
+        // Search functionality
+        document
+          .getElementById("searchInput")
+          .addEventListener("input", filterUsers);
+        document
+          .getElementById("statusFilter")
+          .addEventListener("change", filterUsers);
+        document
+          .getElementById("roleFilter")
+          .addEventListener("change", filterUsers);
+
+        // Form submission
+        document
+          .getElementById("userForm")
+          .addEventListener("submit", handleFormSubmit);
+      }
+
+      function filterUsers() {
+        const searchTerm = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const statusFilter = document
+          .getElementById("statusFilter")
+          .value.toLowerCase();
+        const roleFilter = document
+          .getElementById("roleFilter")
+          .value.toLowerCase();
+
+        const filteredUsers = users.filter((user) => {
+          const matchesSearch =
+            user.name.toLowerCase().includes(searchTerm) ||
+            user.email.toLowerCase().includes(searchTerm);
+          const matchesStatus =
+            statusFilter === "" || user.status === statusFilter;
+          const matchesRole =
+            roleFilter === "" || user.role.toLowerCase() === roleFilter;
+
+          return matchesSearch && matchesStatus && matchesRole;
+        });
+
+        const tableBody = document.getElementById("usersTableBody");
+        tableBody.innerHTML = "";
+
+        filteredUsers.forEach((user) => {
+          const row = `
+                  <tr>
+                      <td>
+                          <div class="user-picture">
+                              <img src="${user.image}" alt="${user.name}">
+                          </div>
+                      </td>
+                      <td>
+                          <span class="user-name">${user.name}</span>
+                      </td>
+                      <td>
+                          <span class="user-email">${user.email}</span>
+                      </td>
+                      <td>${user.role}</td>
+                      <td>${user.lastLogin}</td>
+                      <td><span class="status-badge ${user.status}">${user.status}</span></td>
+                      <td>
+                          <div class="action-buttons">
+                              <button class="view-btn" title="View Details" onclick="viewUser(${user.id})">
+                                  <i class="fas fa-eye"></i>
+                              </button>
+                              <button class="edit-btn" title="Edit User" onclick="editUser(${user.id})">
+                                  <i class="fas fa-edit"></i>
+                              </button>
+                              <button class="delete-btn" title="Delete User" onclick="deleteUser(${user.id})">
+                                  <i class="fas fa-trash"></i>
+                              </button>
+                          </div>
+                      </td>
+                  </tr>
+              `;
+          tableBody.innerHTML += row;
+        });
+      }
+
+      function openAddUserModal() {
+        document.getElementById("modalTitle").textContent = "Add New User";
+        document.getElementById("userForm").reset();
+        document.getElementById("userModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("userModal").style.display = "none";
+      }
+
+      function handleFormSubmit(e) {
+        e.preventDefault();
+        // Add form handling logic here
+        closeModal();
+        loadUsers();
+      }
+
+      function editUser(userId) {
+        const user = users.find((u) => u.id === userId);
+        if (user) {
+          document.getElementById("modalTitle").textContent = "Edit User";
+          document.getElementById("userName").value = user.name;
+          document.getElementById("userEmail").value = user.email;
+          document.getElementById("userRole").value = user.role.toLowerCase();
+          document.getElementById("userStatus").value = user.status;
+          document.getElementById("userModal").style.display = "block";
+        }
+      }
+
+      function deleteUser(userId) {
+        if (confirm("Are you sure you want to delete this user?")) {
+          // Add delete logic here
+          loadUsers();
+        }
+      }
+
+      function viewUser(userId) {
+        // Add view logic here
+      }
+      // Add this to your existing script
+      document
+        .getElementById("userPicture")
+        .addEventListener("change", function (e) {
+          const file = e.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            const preview = document.getElementById("picturePreview");
+
+            reader.onload = function (e) {
+              preview.style.display = "block";
+              preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            };
+
+            reader.readAsDataURL(file);
+          }
+        });
+    </script>
+  </body>
+</html>
